@@ -8,6 +8,7 @@ import org.webrtc.DefaultVideoEncoderFactory
 import org.webrtc.EglBase
 import org.webrtc.PeerConnection
 import org.webrtc.PeerConnectionFactory
+import org.webrtc.audio.JavaAudioDeviceModule
 
 /**
  * Provides base WebRTC instances [PeerConnectionFactory] and [PeerConnection.RTCConfiguration]
@@ -31,9 +32,12 @@ class PeerConnectionUtils(
     private val defaultAudioEncoderFactoryFactory = BuiltinAudioEncoderFactoryFactory()
     private val defaultAudioDecoderFactoryFactory = BuiltinAudioDecoderFactoryFactory()
 
+    private val adm = JavaAudioDeviceModule.builder(context).createAudioDeviceModule()
+
     // Creating peer connection factory. We need it to create "PeerConnections"
     val peerConnectionFactory: PeerConnectionFactory = PeerConnectionFactory
         .builder()
+        .setAudioDeviceModule(adm)
         .setVideoDecoderFactory(defaultVideoDecoderFactory)
         .setVideoEncoderFactory(defaultVideoEncoderFactory)
         .setAudioDecoderFactoryFactory(defaultAudioDecoderFactoryFactory)

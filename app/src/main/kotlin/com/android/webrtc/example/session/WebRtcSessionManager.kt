@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import org.webrtc.AudioTrack
 import org.webrtc.Camera2Enumerator
 import org.webrtc.IceCandidate
 import org.webrtc.MediaConstraints
@@ -23,8 +24,10 @@ import org.webrtc.SurfaceTextureHelper
 import org.webrtc.VideoCapturer
 import org.webrtc.VideoTrack
 
-private const val VIDEO_WIDTH = 320
-private const val VIDEO_HEIGHT = 240
+//private const val VIDEO_WIDTH = 320
+//private const val VIDEO_HEIGHT = 240
+private const val VIDEO_WIDTH = 1280
+private const val VIDEO_HEIGHT = 720
 private const val VIDEO_FPS = 30
 
 private const val ICE_SEPARATOR = '$'
@@ -53,6 +56,11 @@ class WebRtcSessionManager(
                 "OfferToReceiveVideo", "true"
             )
         )
+        mandatory.add(
+            MediaConstraints.KeyValuePair(
+                "OfferToReceiveAudio", "true"
+            )
+        )
     }
 
     // getting front camera
@@ -71,10 +79,21 @@ class WebRtcSessionManager(
         }
     }
 
+    private val audioSource by lazy {
+        peerConnectionFactory.createAudioSource(mediaConstraints)
+    }
+
     private val localVideoTrack: VideoTrack by lazy {
         peerConnectionFactory.createVideoTrack(
             "Video${UUID.randomUUID()}",
             videoSource
+        )
+    }
+
+    private val localAudioTrack: AudioTrack by lazy {
+        peerConnectionFactory.createAudioTrack(
+            "Video${UUID.randomUUID()}",
+            audioSource
         )
     }
 
@@ -101,6 +120,7 @@ class WebRtcSessionManager(
     fun onSessionScreenReady() {
         peerConnectionExecutor.execute {
             peerConnection.addTrack(localVideoTrack)
+            peerConnection.addTrack(localAudioTrack)
             sessionManagerScope.launch {
                 // sending local video track to show local video from start
                 _localVideoSinkFlow.emit(localVideoTrack)

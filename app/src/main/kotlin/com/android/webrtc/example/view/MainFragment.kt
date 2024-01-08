@@ -52,7 +52,13 @@ class MainFragment : Fragment() {
         }
         // NOTE: Don't do like this in production! Always check for the result
         // Here we are just assuming that user will allow access
-        requireActivity().requestPermissions(arrayOf(Manifest.permission.CAMERA), 0)
+        requireActivity().requestPermissions(
+            arrayOf(
+                Manifest.permission.CAMERA,
+                Manifest.permission.RECORD_AUDIO
+            ),
+            0
+        )
     }
 
     // state handling is just changing message in textview and text/visibility of the button
